@@ -25,7 +25,7 @@ void registrarElemento(Elemento &elemento){
     
     for(int i = 1; i <= 3; i++)
     {
-        cout<<"Ingrese la carga "<<i<<": "<<endl;
+        cout<<"Ingrese la carga "<<i<<" (en Newtons): "<<endl;
         cin>> elemento.cargas[i];
     }
 
@@ -57,6 +57,23 @@ void maxElem()
     
 }
 
+float calcularFactor(Elemento *elemento){
+    float suma = 0;
+    float *p = elemento ->cargas; //Recibir un puntero a un Elemento
+
+    for(int i= 0; i<3; i++){
+        suma += *p;
+        p++;
+    }
+
+    float cargaProm = suma/3;
+
+    float CalcFacUt = cargaProm / elemento->capMAx;
+
+    elemento->facUt = CalcFacUt;
+
+    return CalcFacUt;
+}
 
 
 int main(){
