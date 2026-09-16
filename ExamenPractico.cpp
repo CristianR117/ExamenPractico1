@@ -75,6 +75,22 @@ float calcularFactor(Elemento *elemento){
     return CalcFacUt;
 }
 
+void determinarSeguridad(Elemento &elemento){
+    if(elemento.facUt > 0.00 && elemento.facUt <= 0.50 ){
+        cout<<"SEGURO"<<endl;
+    }
+    else if(elemento.facUt > 0.50 && elemento.facUt <= 0.80 ){
+        cout<<"PRECAUCION"<<endl;
+    }
+    else if(elemento.facUt > 0.80 && elemento.facUt <= 1.00 ){
+        cout<<"RIESGO"<<endl;
+    }
+    else if(elemento.facUt > 1.00){
+        cout<<"SOBRECARGA"<<endl;
+    }
+}
+
+
 
 int main(){
     maxElem();
