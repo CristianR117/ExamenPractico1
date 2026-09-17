@@ -23,9 +23,9 @@ void registrarElemento(Elemento &elemento){
     cout<<"Ingrese su longitud: "<<endl;
     cin>> elemento.longitud;
     
-    for(int i = 1; i <= 3; i++)
+    for(int i = 0; i < 3; i++)
     {
-        cout<<"Ingrese la carga "<<i<<" (en Newtons): "<<endl;
+        cout<<"Ingrese la carga "<<i + 1<<" (en Newtons): "<<endl;
         cin>> elemento.cargas[i];
     }
 
@@ -33,26 +33,24 @@ void registrarElemento(Elemento &elemento){
     cin>> elemento.capMAx;
 }
 
-void maxElem()
+void maxElem(Elemento elementos[], int &cantidad)
 {
-    int cant = 0;
 
     do
     {
         cout<<"Ingrese la cantidad de elementos (Max. 10): ";
-        cin>>cant;
+        cin>>cantidad;
 
-       if(cant > elementosMAx)
+       if(cantidad > elementosMAx)
        {
         cout<<"Cantidad de elementos invalido, intente de nuevo"<<endl;
        } 
        
-    } while (cant > 10 || cant < 1);
+    } while (cantidad > elementosMAx || cantidad < 1);
 
-    for(int i = 0; i < cant; i++)
+    for(int i = 0; i < cantidad; i++)
     {
-        Elemento elem;
-        registrarElemento(elem);
+        registrarElemento(elementos[i]);
     }
     
 }
@@ -76,24 +74,57 @@ float calcularFactor(Elemento *elemento){
 }
 
 void determinarSeguridad(Elemento &elemento){
-    if(elemento.facUt > 0.00 && elemento.facUt <= 0.50 ){
-        cout<<"SEGURO"<<endl;
+    if(elemento.facUt >= 0.00 && elemento.facUt <= 0.50 ){
+        elemento.estSeg = "SEGURO";
     }
     else if(elemento.facUt > 0.50 && elemento.facUt <= 0.80 ){
-        cout<<"PRECAUCION"<<endl;
+        elemento.estSeg = "PRECAUCION";
     }
     else if(elemento.facUt > 0.80 && elemento.facUt <= 1.00 ){
-        cout<<"RIESGO"<<endl;
+        elemento.estSeg = "RIESGO";
     }
     else if(elemento.facUt > 1.00){
-        cout<<"SOBRECARGA"<<endl;
+        elemento.estSeg = "SOBRECARGA";
     }
 }
 
+Elemento* obtenerElementoCritico(Elemento elementos[],int cantidad){
+    Elemento *elementoCritico = &elementos[0];
+
+    for(int i=1; i < cantidad; i++){
+        if(elementos[i].facUt > elementoCritico->facUt){
+            elementoCritico = &elementos[i];
+        }
+    }
+    return elementoCritico;
+}
+
+void mostrarElemento(Elemento *elemento) {
+    cout << "***elemento con mayor factor de utilizacion***" << endl;
+    cout << "Codigo: " << elemento->codigo << endl;
+    cout << "Nombre: " << elemento->nombre << endl;
+    cout << "Longitud: " << elemento->longitud << endl;
+    cout << "Carga 1: " << elemento->cargas[0] << endl;
+    cout << "Carga 2: " << elemento->cargas[1] << endl;
+    cout << "Carga 3: " << elemento->cargas[2] << endl;
+    cout << "Capacidad maxima: " << elemento->capMAx << endl;
+    cout << "Factor de utilizacion: " << elemento->facUt << endl;
+    cout << "Estado: " << elemento->estSeg << endl;
+}
 
 
 int main(){
-    maxElem();
+    Elemento elementos[elementosMAx];
+    int cantidad;
+    maxElem(elementos,cantidad);
+
+    for(int i = 0; i < cantidad; i++){
+        calcularFactor(&elementos[i]);
+        determinarSeguridad(elementos[i]);
+    }
+    
+    Elemento* elemComprometido = obtenerElementoCritico(elementos, cantidad);
+    mostrarElemento(elemComprometido);
 
     return 0;
 }
