@@ -127,6 +127,50 @@ void aumentarCargas(Elemento &elemento, float porcentaje){
     }
 }
 
+void generarInforme(Elemento elementos[], int cantidad){
+    int contSeguro = 0;
+    int contPrecaucion = 0;
+    int contRiesgo = 0;
+    int contSobrecarga = 0;
+    float sumaFactores = 0;
+
+    cout<<"***Informe general de elementos***"<<endl;
+    for(int i = 0; i<cantidad; i++){
+        float cargaProm = (elementos[i].cargas[0] + elementos[i].cargas[1] + elementos[i].cargas[2])/3.0;
+        cout<<"Elemento: "<< i + 1 <<endl;
+        cout<<"Codigo:"<<elementos[i].codigo<<endl;
+        cout<<"Nombre:"<<elementos[i].nombre<<endl;
+        cout<<"Carga promedio: "<<cargaProm<<endl;
+        cout<<"Factor de utilizacion:"<<elementos[i].facUt<<endl;
+        cout<<"Estado:"<<elementos[i].estSeg<<endl;
+
+        if(elementos[i].estSeg == "SEGURO"){
+            contSeguro++;
+        }
+        else if(elementos[i].estSeg == "PRECAUCION"){
+            contPrecaucion++;
+        }
+        else if(elementos[i].estSeg == "RIESGO"){
+            contRiesgo++;
+        }
+        else if(elementos[i].estSeg == "SOBRECARGA"){
+            contSobrecarga++;
+        }
+
+         sumaFactores += elementos[i].facUt;
+    }
+
+    float factPromGeneral = sumaFactores/cantidad;
+
+    cout<<"***Resumen por estado***"<<endl;
+    cout<<"SEGURO: "<<contSeguro<<endl;
+    cout<<"PRECAUCION: "<<contPrecaucion<<endl;
+    cout<<"RIESGO: "<<contRiesgo<<endl;
+    cout<<"SOBRECARGA: "<<contSobrecarga<<endl;
+    cout<<"Factor de utilizacion de toda la estructura: "<<factPromGeneral<<endl;
+    
+}
+
 
 int main(){
     Elemento elementos[elementosMAx];
@@ -148,6 +192,8 @@ int main(){
     determinarSeguridad(*elemComprometido);
     
     mostrarElemento(elemComprometido);
+
+    generarInforme(elementos, cantidad);
 
 
     return 0;
