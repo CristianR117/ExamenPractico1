@@ -112,10 +112,26 @@ void mostrarElemento(Elemento *elemento) {
     cout << "Estado: " << elemento->estSeg << endl;
 }
 
+void aumentarCargas(Elemento &elemento, float porcentaje){
+    char respuesta;
+    
+    cout << "Desea aumentar las cargas del elemento? [s/n]"<<endl;
+    cin >> respuesta;
+
+    if(respuesta == 's' || respuesta == 'S'){
+        for(int i = 0; i < 3; i++){
+            cout << "Ingrese el porcentaje de aumento para la carga " << i + 1 << ", ingrese en [1-100]: ";
+            cin >> porcentaje;
+            elemento.cargas[i] = elemento.cargas[i] * (1 + porcentaje/100);
+        }
+    }
+}
+
 
 int main(){
     Elemento elementos[elementosMAx];
     int cantidad;
+    float porcentaje;
     maxElem(elementos,cantidad);
 
     for(int i = 0; i < cantidad; i++){
@@ -125,6 +141,14 @@ int main(){
     
     Elemento* elemComprometido = obtenerElementoCritico(elementos, cantidad);
     mostrarElemento(elemComprometido);
+
+    aumentarCargas(*elemComprometido, porcentaje);
+
+    calcularFactor(elemComprometido);
+    determinarSeguridad(*elemComprometido);
+    
+    mostrarElemento(elemComprometido);
+
 
     return 0;
 }
