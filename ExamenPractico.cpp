@@ -23,9 +23,9 @@ void registrarElemento(Elemento &elemento){
     cout<<"Ingrese su longitud: "<<endl;
     cin>> elemento.longitud;
     
-    for(int i = 1; i <= 3; i++)
+    for(int i = 0; i < 3; i++)
     {
-        cout<<"Ingrese la carga "<<i<<" (en Newtons): "<<endl;
+        cout<<"Ingrese la carga "<<i + 1<<" (en Newtons): "<<endl;
         cin>> elemento.cargas[i];
     }
 
@@ -33,26 +33,24 @@ void registrarElemento(Elemento &elemento){
     cin>> elemento.capMAx;
 }
 
-void maxElem()
+void maxElem(Elemento elementos[], int &cantidad)
 {
-    int cant = 0;
 
     do
     {
         cout<<"Ingrese la cantidad de elementos (Max. 10): ";
-        cin>>cant;
+        cin>>cantidad;
 
-       if(cant > elementosMAx)
+       if(cantidad > elementosMAx)
        {
         cout<<"Cantidad de elementos invalido, intente de nuevo"<<endl;
        } 
        
-    } while (cant > 10 || cant < 1);
+    } while (cantidad > elementosMAx || cantidad < 1);
 
-    for(int i = 0; i < cant; i++)
+    for(int i = 0; i < cantidad; i++)
     {
-        Elemento elem;
-        registrarElemento(elem);
+        registrarElemento(elementos[i]);
     }
     
 }
@@ -76,24 +74,127 @@ float calcularFactor(Elemento *elemento){
 }
 
 void determinarSeguridad(Elemento &elemento){
-    if(elemento.facUt > 0.00 && elemento.facUt <= 0.50 ){
-        cout<<"SEGURO"<<endl;
+    if(elemento.facUt >= 0.00 && elemento.facUt <= 0.50 ){
+        elemento.estSeg = "SEGURO";
     }
     else if(elemento.facUt > 0.50 && elemento.facUt <= 0.80 ){
-        cout<<"PRECAUCION"<<endl;
+        elemento.estSeg = "PRECAUCION";
     }
     else if(elemento.facUt > 0.80 && elemento.facUt <= 1.00 ){
-        cout<<"RIESGO"<<endl;
+        elemento.estSeg = "RIESGO";
     }
     else if(elemento.facUt > 1.00){
-        cout<<"SOBRECARGA"<<endl;
+        elemento.estSeg = "SOBRECARGA";
     }
 }
 
+Elemento* obtenerElementoCritico(Elemento elementos[],int cantidad){
+    Elemento *elementoCritico = &elementos[0];
+
+    for(int i=1; i < cantidad; i++){
+        if(elementos[i].facUt > elementoCritico->facUt){
+            elementoCritico = &elementos[i];
+        }
+    }
+    return elementoCritico;
+}
+
+void mostrarElemento(Elemento *elemento) {
+    cout << "***elemento con mayor factor de utilizacion***" << endl;
+    cout << "Codigo: " << elemento->codigo << endl;
+    cout << "Nombre: " << elemento->nombre << endl;
+    cout << "Longitud: " << elemento->longitud << endl;
+    cout << "Carga 1: " << elemento->cargas[0] << endl;
+    cout << "Carga 2: " << elemento->cargas[1] << endl;
+    cout << "Carga 3: " << elemento->cargas[2] << endl;
+    cout << "Capacidad maxima: " << elemento->capMAx << endl;
+    cout << "Factor de utilizacion: " << elemento->facUt << endl;
+    cout << "Estado: " << elemento->estSeg << endl;
+}
+
+void aumentarCargas(Elemento &elemento, float porcentaje){
+    char respuesta;
+    
+    cout << "Desea aumentar las cargas del elemento? [s/n]"<<endl;
+    cin >> respuesta;
+
+    if(respuesta == 's' || respuesta == 'S'){
+        for(int i = 0; i < 3; i++){
+            cout << "Ingrese el porcentaje de aumento para la carga " << i + 1 << ", ingrese en [1-100]: ";
+            cin >> porcentaje;
+            elemento.cargas[i] = elemento.cargas[i] * (1 + porcentaje/100);
+        }
+    }
+}
+
+void generarInforme(Elemento elementos[], int cantidad){
+    int contSeguro = 0;
+    int contPrecaucion = 0;
+    int contRiesgo = 0;
+    int contSobrecarga = 0;
+    float sumaFactores = 0;
+
+    cout<<"***Informe general de elementos***"<<endl;
+    for(int i = 0; i<cantidad; i++){
+        float cargaProm = (elementos[i].cargas[0] + elementos[i].cargas[1] + elementos[i].cargas[2])/3.0;
+        cout<<"Elemento: "<< i + 1 <<endl;
+        cout<<"Codigo:"<<elementos[i].codigo<<endl;
+        cout<<"Nombre:"<<elementos[i].nombre<<endl;
+        cout<<"Carga promedio: "<<cargaProm<<endl;
+        cout<<"Factor de utilizacion:"<<elementos[i].facUt<<endl;
+        cout<<"Estado:"<<elementos[i].estSeg<<endl;
+
+        if(elementos[i].estSeg == "SEGURO"){
+            contSeguro++;
+        }
+        else if(elementos[i].estSeg == "PRECAUCION"){
+            contPrecaucion++;
+        }
+        else if(elementos[i].estSeg == "RIESGO"){
+            contRiesgo++;
+        }
+        else if(elementos[i].estSeg == "SOBRECARGA"){
+            contSobrecarga++;
+        }
+
+         sumaFactores += elementos[i].facUt;
+    }
+
+    float factPromGeneral = sumaFactores/cantidad;
+
+    cout<<"***Resumen por estado***"<<endl;
+    cout<<"SEGURO: "<<contSeguro<<endl;
+    cout<<"PRECAUCION: "<<contPrecaucion<<endl;
+    cout<<"RIESGO: "<<contRiesgo<<endl;
+    cout<<"SOBRECARGA: "<<contSobrecarga<<endl;
+    cout<<"Factor de utilizacion de toda la estructura: "<<factPromGeneral<<endl;
+    
+}
 
 
 int main(){
-    maxElem();
+    Elemento elementos[elementosMAx];
+    int cantidad;
+    float porcentaje;
+    maxElem(elementos,cantidad);
+
+    for(int i = 0; i < cantidad; i++){
+        calcularFactor(&elementos[i]);
+        determinarSeguridad(elementos[i]);
+    }
+    
+    Elemento* elemComprometido = obtenerElementoCritico(elementos, cantidad);
+    mostrarElemento(elemComprometido);
+
+    aumentarCargas(*elemComprometido, porcentaje);
+
+    calcularFactor(elemComprometido);
+    determinarSeguridad(*elemComprometido);
+    
+    mostrarElemento(elemComprometido);
+
+    generarInforme(elementos, cantidad);
+
 
     return 0;
 }
